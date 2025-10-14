@@ -7,7 +7,7 @@
     <!-- Google Fonts for Poppins and Gochi Hand (for birthday title) -->
     <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* General Setup */
+        /* --- ORIGINAL VIBRANT BLUE COLOR PALETTE --- */
         :root {
             --color-primary: #1e90ff; /* Dodger Blue */
             --color-secondary: #4da6ff; /* Lighter Blue */
@@ -16,6 +16,8 @@
             --color-gold: #FFD700; /* Gold for Note */
             --color-gold-bg: #fff8e1; /* Pale Gold BG */
             --color-motivation: #d9ead3; /* Light Greenish-White for Motivation */
+            --color-peg-wood: #8B4513; /* Saddle Brown for Pegs */
+            --color-base-wood: #A0522D; /* Sienna for Base */
         }
         body {
             margin: 0;
@@ -116,13 +118,14 @@
         }
         .media-item {
             width: 100%;
-            max-width: 250px;
-            height: 150px; /* Fixed height for wrappers */
+            max-width: 200px; 
+            height: 140px; 
             overflow: hidden;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             cursor: pointer;
             transition: transform 0.3s, opacity 0.3s;
+            border: 2px solid var(--color-secondary); 
         }
         .media-item img, .media-item video {
             width: 100%;
@@ -131,7 +134,7 @@
         }
         @media (max-width: 600px) {
             .media-item {
-                max-width: 45%; /* Two items per row on mobile */
+                max-width: 45%; 
                 height: 120px;
             }
         }
@@ -154,6 +157,11 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 16 / 9; 
+        }
+        .video-wrapper iframe {
+             width: 100%;
+             height: 100%;
         }
 
         /* ------------------ Thank You Note Section ------------------ */
@@ -188,72 +196,107 @@
             color: var(--color-text);
         }
         
-        /* ------------------ Sudoku ------------------ */
-        #sudoku {
-            display: grid;
-            grid-template-columns: repeat(9, clamp(35px, 9vw, 40px));
-            grid-template-rows: repeat(9, clamp(35px, 9vw, 40px));
-            gap: 1px;
+        /* ------------------ Tower of Hanoi Game (4 Pegs) ------------------ */
+        #hanoi-game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            margin: 20px auto;
-            border: 3px solid var(--color-primary);
-            background: var(--color-primary);
+            padding: 1rem;
+            background: #f8f8f8;
             border-radius: 10px;
         }
-        #sudoku input {
-            width: 100%;
+        .pegs-container {
+            display: flex;
+            justify-content: space-between; /* Adjusted for 4 pegs */
+            width: 95%; /* Wider to fit 4 pegs */
+            max-width: 650px;
+            height: 200px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+            position: relative;
+            padding: 0 10px;
+            border-bottom: 15px solid var(--color-base-wood); /* Shared wooden base */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .peg {
+            width: 15px; /* Increased width from 8px to 15px */
             height: 100%;
-            text-align: center;
-            font-size: clamp(16px, 4vw, 18px);
-            border: none;
-            outline: none;
-            padding: 0;
-            box-sizing: border-box;
-            background: white;
-            transition: background-color 0.3s;
-        }
-        /* Block Borders */
-        #sudoku input:nth-child(3n) { border-right: 3px solid var(--color-primary); }
-        #sudoku input:nth-child(9n) { border-right: none; }
-        /* Apply thicker bottom border every 3 rows (27 inputs) */
-        #sudoku-container div:nth-child(27n) ~ #sudoku input { border-bottom: 3px solid var(--color-primary); } 
-        #sudoku input:disabled {
-            background: #cce6ff;
-            font-weight: bold;
-            color: var(--color-text);
-        }
-        #checkSudoku {
-            padding: 12px 24px;
-            margin-top: 1rem;
-            background: var(--color-secondary);
-            color: white;
-            border: none;
-            border-radius: 10px;
+            background-color: var(--color-peg-wood); 
+            position: relative;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: background 0.3s, transform 0.1s;
-            display: block;
-            margin: 1rem auto 0;
+            margin: 0 1%; /* Closer spacing */
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            transition: background-color 0.2s;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4); /* Inner shadow for 3D effect */
         }
-        #checkSudoku:hover {
+        .peg.target-ready {
+            background-color: #6aa84f; /* Green highlight for valid placement */
+        }
+        .peg.target-ready:hover {
+            background-color: #5b8f3b;
+        }
+        .disk {
+            position: absolute;
+            height: 24px; /* Slightly taller disks */
             background: var(--color-primary);
+            border: 1px solid #1e2a40;
+            border-radius: 4px; /* Square/pill-like disks */
+            cursor: pointer;
+            bottom: 0px; 
+            transition: transform 0.3s ease, background-color 0.2s, width 0.3s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4); /* Stronger disk shadow */
+        }
+        .disk.selected {
+            background-color: #e74c3c; /* Red when selected */
+            transform: translateY(-28px); /* Lift the disk up */
+            z-index: 10;
+        }
+        /* Disk sizing relative to max width (for 4 disks) - VIBRANT BLUE THEME COLORS */
+        .disk[data-size="1"] { 
+            width: 35%; 
+            background: linear-gradient(to top, #77d4f9, #a8e5ff); /* Light Blue Gradient */
+        }
+        .disk[data-size="2"] { 
+            width: 55%; 
+            background: linear-gradient(to top, #00bfff, #5bd8ff); /* Deep Sky Blue Gradient */
+        } 
+        .disk[data-size="3"] { 
+            width: 75%; 
+            background: linear-gradient(to top, #1e90ff, #5aaaff); /* Dodger Blue Gradient */
+        } 
+        .disk[data-size="4"] { 
+            width: 95%; /* Made largest disk slightly wider */
+            background: linear-gradient(to top, #005A9C, #0088e0); /* Darker Navy Blue Gradient */
+        } 
+
+        .controls { text-align: center; margin-top: 1rem; }
+        #resetHanoiBtn { 
+            padding: 10px 20px; background: var(--color-primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); transition: background 0.3s, transform 0.1s; 
+        }
+        #resetHanoiBtn:hover { background: var(--color-secondary); transform: translateY(-1px); }
+        #hanoiMessage, #hanoiMoves { font-weight: 600; color: var(--color-text); margin-top: 0.5rem; }
+        .hanoi-win { background-color: #ccffcc; animation: successFlash 1s ease-out; }
+        
+        /* Solution Modal Styling */
+        #showSolutionBtn {
+            padding: 10px 20px; 
+            background: #FFD700; /* Gold Button */
+            color: var(--color-text); 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            transition: background 0.3s, transform 0.1s;
+            margin-left: 10px;
+        }
+        #showSolutionBtn:hover {
+            background: #e7c300;
             transform: translateY(-1px);
-        }
-        #sudokuResult {
-            text-align: center;
-            margin-top: 0.8rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--color-text);
-        }
-        .sudoku-success-flash {
-            animation: successFlash 1s ease-out;
-        }
-        @keyframes successFlash {
-            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-            50% { box-shadow: 0 0 20px 10px rgba(76, 175, 80, 0.7); }
-            100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
         }
 
         /* ------------------ Daily Motivation Section ------------------ */
@@ -355,6 +398,14 @@
             color: #bbb;
             text-decoration: none;
         }
+        /* Table styling for solution modal */
+        #solutionTable th, #solutionTable td {
+            padding: 8px; 
+            border: 1px solid #ddd;
+        }
+        #solutionTable tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -366,20 +417,20 @@
 
     <section id="memory-wall-section">
         <h2>📸 मेमरी वॉल (Memory Wall)</h2>
-        <p style="text-align: center; font-style: italic; color: #555;">(Tap on any media to view full screen!)</p>
+        <p style="text-align: center; font-style: italic; color: #555;">(Tap on any media to view full screen! Now with 8 photo spots!)</p>
         <div id="preview">
             <!-- Media will be loaded here by JavaScript -->
         </div>
     </section>
 
-    <!-- NEW SECTION: Dedicated Google Drive Video Embeds -->
+    <!-- Dedicated Google Drive Video Embeds -->
     <section id="video-memories-section">
         <h2>🎞️Video Memories</h2>
         <p style="text-align: center; color: var(--color-text); margin-bottom: 20px;">
-           
+            Here are our special video clips.
             <br>
             <span style="font-weight: 600; font-size: 0.9rem; color: #e74c3c;">
-               
+                
             </span>
         </p>
         <div id="videoEmbedsContainer">
@@ -405,16 +456,25 @@
         </div>
     </section>
     
-    <!-- Sudoku Mini Game Reinstated with New Values -->
-    <section>
-        <h2>🎮 सुडोकू मिनी गेम (Sudoku Mini Game)</h2>
-        <div id="sudoku-container">
-            <div id="sudoku"></div>
-            <button id="checkSudoku">सुडोकू तपासा</button>
-            <p id="sudokuResult"></p>
+    <!-- NEW BRAIN GAME: Tower of Hanoi (Updated to 4 Pegs / 4 Disks) -->
+    <section id="hanoi-section">
+        <h2>🧠 टॉवर ऑफ हनोई (Tower of Hanoi)</h2>
+        <p style="text-align: center; font-style: italic; color: #555; margin-bottom: 1rem;">(Move 4 disks from Peg A to Peg D in the fewest moves)</p>
+        <div id="hanoi-game-container">
+            <div class="pegs-container">
+                <div id="peg-A" class="peg" data-peg="A"></div>
+                <div id="peg-B" class="peg" data-peg="B"></div>
+                <div id="peg-C" class="peg" data-peg="C"></div>
+                <div id="peg-D" class="peg" data-peg="D"></div>
+            </div>
+            <div class="controls">
+                <p id="hanoiMessage" style="color: var(--color-text);">Click the peg you want to take a disk from.</p>
+                <p id="hanoiMoves">Moves: 0</p>
+                <button id="resetHanoiBtn">Reset Game</button>
+                <button id="showSolutionBtn">View Best Moves (9 Moves)</button>
+            </div>
         </div>
     </section>
-
     
     <!-- Daily Motivational Quote Section -->
     <section class="daily-quote-section">
@@ -444,6 +504,28 @@
             <ul id="quotesList" class="quotes-list" style="padding: 0; margin: 0;"></ul>
         </div>
     </div>
+    
+    <!-- New Modal for Hanoi Solution -->
+    <div id="hanoiSolutionModal" class="modal" onclick="closeHanoiSolutionModal()">
+        <div class="quotes-modal-content" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeHanoiSolutionModal()">&times;</span>
+            <h3 style="text-align: center; color: var(--color-primary); margin-top: 0;">Optimal Solution (9 Moves)</h3>
+            <p style="text-align: center;">The fastest way to move 4 disks from Peg A to Peg D:</p>
+            <table id="solutionTable" style="width: 100%; text-align: center; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr style="background-color: #f0f8ff;">
+                        <th style="padding: 8px; border: 1px solid #ddd;">Step</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Disk</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">From</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Solution steps will be generated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <script>
         // --- 1. Confetti Animation Setup ---
@@ -457,7 +539,7 @@
         }
         setInterval(createGrain, 200);
 
-        // --- 2. Memory Wall & Modal Setup ---
+        // --- 2. Memory Wall & Modal Setup (Updated for 8 photos) ---
         const mediaUrls = [
             { url: "./assets/RUCHITA_IMAGE_1.jpg", type: "image" },
             { url: "./assets/RUCHITA_IMAGE_2.jpg", type: "image" },
@@ -465,6 +547,8 @@
             { url: "./assets/RUCHITA_IMAGE_4.jpg", type: "image" },
             { url: "./assets/RUCHITA_IMAGE_5.jpg", type: "image" }, 
             { url: "./assets/RUCHITA_IMAGE_6.jpg", type: "image" }, 
+            { url: "./assets/RUCHITA_IMAGE_7.jpg", type: "image" }, // Spot 7
+            { url: "./assets/RUCHITA_IMAGE_8.jpg", type: "image" }, // Spot 8
         ];
 
         const previewContainer = document.getElementById('preview');
@@ -527,23 +611,16 @@
         document.getElementById('mediaModal').querySelector('.close').addEventListener('click', closeMediaModal);
 
 
-        // --- 3. Google Drive Video Setup (New Section) ---
-        // IMPORTANT: Only paste the 28-character Google Drive File ID here!
-        // You can find the ID in the share link: /d/FILE_ID_HERE/view
+        // --- 3. Google Drive Video Setup ---
         const driveVideoIds = [
-            // Working Example (ID extracted from the link you provided):
             "11EJ2Hl2lwQFVF91LUS3OxEqdkkLPRLKO", 
-            // Placeholder for another video:
             "1WbtDdChJbIwLrvc_4YpXz3IUyTool0kt", 
-
             "1gRbI7djlHEPO4cdKj5_D6JTBdqVEgfLq",
-            // Add more IDs as needed!
         ];
 
         const videoEmbedsContainer = document.getElementById('videoEmbedsContainer');
 
         function setupDriveVideos() {
-            // Check for placeholder IDs
             const hasPlaceholders = driveVideoIds.some(id => id.includes("YOUR_VIDEO_FILE_ID"));
 
             if (driveVideoIds.length === 0 || hasPlaceholders) {
@@ -556,7 +633,6 @@
             }
 
             driveVideoIds.forEach(id => {
-                // This URL format constructs the stable Google Drive embed link.
                 const embedUrl = `https://drive.google.com/file/d/${id}/preview`;
 
                 const videoWrapper = document.createElement('div');
@@ -565,7 +641,7 @@
                 const iframe = document.createElement('iframe');
                 iframe.src = embedUrl;
                 iframe.width = "100%";
-                iframe.height = "350"; 
+                iframe.height = "100%"; 
                 iframe.style.border = "none";
                 iframe.allow = "autoplay";
                 iframe.setAttribute('allowfullscreen', '');
@@ -576,103 +652,215 @@
             });
         }
 
+        // --- 4. Tower of Hanoi Logic (4 Pegs / 4 Disks) ---
+        const hanoi = {
+            pegs: { A: [4, 3, 2, 1], B: [], C: [], D: [] }, // 4 Disks (4=largest, 1=smallest) and 4 Pegs
+            moves: 0,
+            selectedDisk: null, 
+            sourcePeg: null,
+            diskElements: {}, // Map disk size to its DOM element
+        };
 
-        // --- 4. Sudoku Game Logic ---
-        const sudokuContainer = document.getElementById('sudoku');
-        let solution = [
-            [4,3,5,2,6,9,7,8,1],
-            [6,8,2,5,7,1,4,9,3],
-            [1,9,7,8,3,4,5,6,2],
-            [8,2,6,1,9,5,3,4,7],
-            [3,7,4,6,8,2,9,1,5],
-            [9,5,1,7,4,3,6,2,8],
-            [5,1,9,3,2,6,8,7,4],
-            [2,4,8,9,5,7,1,3,6],
-            [7,6,3,4,1,8,2,5,9]
+        // Optimal move sequence for 4 disks, 4 pegs (Reve's Puzzle)
+        const optimalMoves = [
+            { disk: 1, from: 'A', to: 'C' },
+            { disk: 2, from: 'A', to: 'B' },
+            { disk: 1, from: 'C', to: 'B' },
+            { disk: 3, from: 'A', to: 'D' },
+            { disk: 4, from: 'A', to: 'C' },
+            { disk: 3, from: 'D', to: 'C' },
+            { disk: 1, from: 'B', to: 'A' },
+            { disk: 2, from: 'B', to: 'D' },
+            { disk: 1, from: 'A', to: 'D' }
         ];
 
-        let puzzle = [
-            [0,0,0,2,6,0,7,0,1],
-            [6,8,0,0,7,0,0,9,0],
-            [1,9,0,0,0,4,5,0,0],
-            [8,2,0,1,0,0,0,4,0],
-            [0,0,4,6,0,2,9,0,0],
-            [0,5,0,0,0,3,0,2,8],
-            [0,0,9,3,0,0,0,7,4],
-            [0,4,0,0,5,0,0,3,6],
-            [7,0,3,0,1,8,0,0,0]
-        ];
+        const pegElements = {
+            A: document.getElementById('peg-A'),
+            B: document.getElementById('peg-B'),
+            C: document.getElementById('peg-C'),
+            D: document.getElementById('peg-D'), // New Peg D element
+        };
+        const hanoiMessage = document.getElementById('hanoiMessage');
+        const hanoiMoves = document.getElementById('hanoiMoves');
+        const pegsContainer = document.querySelector('.pegs-container');
+        const numDisks = 4;
+        const targetPegId = 'D';
 
-        function createSudokuGrid() {
-            sudokuContainer.innerHTML = ''; 
-            puzzle.forEach((row, r) => {
-                row.forEach((num, c) => {
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.min = 1;
-                    input.max = 9;
-                    input.maxLength = 1;
+        function updateHanoiUI() {
+            // Remove all existing disks
+            document.querySelectorAll('.disk').forEach(disk => disk.remove());
+
+            // Redraw disks based on hanoi.pegs state
+            Object.keys(hanoi.pegs).forEach(pegId => {
+                const peg = pegElements[pegId];
+                hanoi.pegs[pegId].forEach((diskSize, index) => {
+                    let diskElement = hanoi.diskElements[diskSize];
                     
-                    input.dataset.row = r;
-                    input.dataset.col = c;
+                    // Reposition disk (disk height is 20px in CSS + 4px extra spacing = 24px)
+                    diskElement.style.bottom = `${index * 24}px`;
                     
-                    if (r % 3 === 2 && r !== 8) { input.style.borderBottom = '3px solid var(--color-primary)'; }
-                    if (c % 3 === 2 && c !== 8) { input.style.borderRight = '3px solid var(--color-primary)'; }
-                    
-                    if (num !== 0) {
-                        input.value = num;
-                        input.disabled = true;
-                    }
-                    
-                    input.addEventListener('input', function() {
-                        this.value = this.value.replace(/[^1-9]/g, '');
-                        if (this.value.length > 1) { this.value = this.value.slice(0, 1); }
-                    });
-                    
-                    sudokuContainer.appendChild(input);
+                    // Attach disk to its parent peg
+                    peg.appendChild(diskElement);
                 });
             });
+
+            // Update move counter. (Removed Best Move as 4-peg min moves is complex)
+            hanoiMoves.textContent = `Moves: ${hanoi.moves}`;
+
+            // Check for win condition (all 4 disks on target peg D)
+            if (hanoi.pegs[targetPegId].length === numDisks) {
+                hanoiMessage.textContent = '🎉 You Win! Solved in ' + hanoi.moves + ' moves!';
+                hanoiMessage.style.color = '#38761d';
+                document.getElementById('hanoi-section').classList.add('hanoi-win');
+                pegsContainer.removeEventListener('click', hanoiClickHandler);
+            }
         }
 
-        document.getElementById('checkSudoku').addEventListener('click', () => {
-            const inputs = sudokuContainer.querySelectorAll('input');
-            let correct = true;
-            let totalFilled = 0;
-            inputs.forEach((input) => {
-                const r = parseInt(input.dataset.row);
-                const c = parseInt(input.dataset.col);
-                const inputValue = parseInt(input.value) || 0;
-                
-                if (!input.disabled) {
-                     input.style.backgroundColor = 'white'; 
-                    if (inputValue !== 0) {
-                        totalFilled++;
-                        if (inputValue !== solution[r][c]) {
-                            correct = false;
-                            input.style.backgroundColor = '#ffcccc'; 
-                        } else {
-                            input.style.backgroundColor = '#ccffcc'; 
+        function isValidMove(diskSize, targetPegId) {
+            const targetPeg = hanoi.pegs[targetPegId];
+            const topDisk = targetPeg[targetPeg.length - 1];
+            
+            // Check if target peg is empty or if the top disk is larger than the disk being moved
+            return targetPeg.length === 0 || diskSize < topDisk;
+        }
+
+        function resetHanoi() {
+            hanoi.pegs = { A: [4, 3, 2, 1], B: [], C: [], D: [] };
+            hanoi.moves = 0;
+            hanoi.selectedDisk = null;
+            hanoi.sourcePeg = null;
+            hanoiMessage.textContent = 'Click the peg you want to take a disk from.';
+            hanoiMessage.style.color = 'var(--color-text)';
+            document.getElementById('hanoi-section').classList.remove('hanoi-win');
+            
+            // Re-enable click handler
+            pegsContainer.addEventListener('click', hanoiClickHandler);
+            
+            // Clear selections
+            document.querySelectorAll('.disk.selected').forEach(d => d.classList.remove('selected'));
+            document.querySelectorAll('.peg.target-ready').forEach(p => p.classList.remove('target-ready'));
+            
+            updateHanoiUI();
+        }
+        
+        function hanoiClickHandler(event) {
+            if (hanoi.pegs[targetPegId].length === numDisks) return; // Game won, ignore clicks
+
+            const targetPegElement = event.target.closest('.peg');
+            if (!targetPegElement) return;
+
+            // FIX: Renamed local variable to prevent shadowing the global 'targetPegId'
+            const clickedPegId = targetPegElement.dataset.peg;
+            const sourcePeg = hanoi.pegs[clickedPegId];
+            const topDiskSize = sourcePeg[sourcePeg.length - 1];
+            
+            document.querySelectorAll('.peg.target-ready').forEach(p => p.classList.remove('target-ready'));
+
+            if (!hanoi.selectedDisk) {
+                // --- Phase 1: Picking up a disk ---
+                if (sourcePeg.length > 0) {
+                    hanoi.selectedDisk = topDiskSize;
+                    hanoi.sourcePeg = clickedPegId;
+                    
+                    // Visually select the disk (only the top one)
+                    const diskElement = hanoi.diskElements[topDiskSize];
+                    diskElement.classList.add('selected');
+                    
+                    hanoiMessage.textContent = `Selected Disk ${hanoi.selectedDisk}. Now click the peg where you want to place it.`;
+                    hanoiMessage.style.color = '#1e90ff';
+                    
+                    // Highlight valid target pegs
+                    Object.keys(hanoi.pegs).forEach(pegId => {
+                        if (pegId !== hanoi.sourcePeg && isValidMove(hanoi.selectedDisk, pegId)) {
+                            pegElements[pegId].classList.add('target-ready');
                         }
-                    }
+                    });
+
                 } else {
-                    totalFilled++; 
+                    hanoiMessage.textContent = "❌ That peg is empty! Try another peg.";
+                    hanoiMessage.style.color = '#e74c3c';
                 }
-            });
-
-            const resultElement = document.getElementById('sudokuResult');
-            const sectionElement = document.getElementById('sudoku-container').closest('section'); 
-            const requiredFilled = 81;
-
-            if (correct && totalFilled === requiredFilled) {
-                resultElement.textContent = "🥳 अभिनंदन! तुम्ही सुडोकू सोडवला आहे! 💙🎉";
-                sectionElement.classList.add('sudoku-success-flash');
-                setTimeout(() => sectionElement.classList.remove('sudoku-success-flash'), 1000);
-            } else if (correct && totalFilled < requiredFilled) {
-                 resultElement.textContent = "🙂 अजून काही घरे भरायची आहेत! पण आतापर्यंतचे सर्व बरोबर आहेत.";
             } else {
-                resultElement.textContent = "❌ काही चुका आहेत. पुन्हा प्रयत्न करा!";
+                // --- Phase 2: Placing a disk ---
+                const diskToMove = hanoi.selectedDisk;
+
+                // Use the renamed variable here
+                if (clickedPegId === hanoi.sourcePeg) {
+                    // Deselect
+                    hanoi.diskElements[diskToMove].classList.remove('selected');
+                    hanoi.selectedDisk = null;
+                    hanoi.sourcePeg = null;
+                    hanoiMessage.textContent = "Disk deselected. Click the peg you want to take a disk from.";
+                    hanoiMessage.style.color = 'var(--color-text)';
+                    return;
+                }
+                
+                // Use the renamed variable here
+                if (isValidMove(diskToMove, clickedPegId)) {
+                    // Execute move
+                    hanoi.pegs[hanoi.sourcePeg].pop(); // Remove from source
+                    hanoi.pegs[clickedPegId].push(diskToMove); // Add to target
+                    hanoi.moves++;
+                    
+                    // Reset selection state
+                    hanoi.diskElements[diskToMove].classList.remove('selected');
+                    hanoi.selectedDisk = null;
+                    hanoi.sourcePeg = null;
+                    hanoiMessage.textContent = 'Valid move! Moves: ' + hanoi.moves;
+                    hanoiMessage.style.color = '#38761d';
+                    
+                    updateHanoiUI();
+                    
+                } else {
+                    hanoiMessage.textContent = "❌ Invalid move! Disk must be smaller than the disk below it.";
+                    hanoiMessage.style.color = '#e74c3c';
+                }
             }
-        });
+        }
+        
+        function initHanoi() {
+            // Create disk elements and store references
+            for(let i = 1; i <= numDisks; i++) {
+                const disk = document.createElement('div');
+                disk.className = 'disk';
+                disk.dataset.size = i;
+                disk.id = 'disk-' + i;
+                hanoi.diskElements[i] = disk;
+            }
+            
+            document.getElementById('resetHanoiBtn').addEventListener('click', resetHanoi);
+            pegsContainer.addEventListener('click', hanoiClickHandler);
+            document.getElementById('showSolutionBtn').addEventListener('click', openHanoiSolutionModal);
+
+            resetHanoi(); // Initial setup
+        }
+
+        function openHanoiSolutionModal() {
+            const solutionModal = document.getElementById('hanoiSolutionModal');
+            const tableBody = solutionModal.querySelector('tbody');
+            tableBody.innerHTML = ''; // Clear previous content
+
+            optimalMoves.forEach((move, index) => {
+                const row = tableBody.insertRow();
+                row.style.borderBottom = '1px solid #eee';
+
+                // Add alternating row colors for readability
+                if (index % 2 === 0) {
+                    row.style.backgroundColor = '#f9f9f9';
+                }
+
+                row.insertCell().textContent = index + 1; // Step
+                row.insertCell().textContent = move.disk; // Disk
+                row.insertCell().textContent = move.from; // From
+                row.insertCell().textContent = move.to; // To
+            });
+            
+            solutionModal.style.display = 'flex';
+        }
+
+        function closeHanoiSolutionModal() {
+            document.getElementById('hanoiSolutionModal').style.display = 'none';
+        }
 
 
         // --- 5. Motivational Quote Shuffler Logic ---
@@ -681,7 +869,7 @@
             { quote: "✨ Set your goal, work hard, and success will be yours. ✨", author: "Swami Vivekananda" },
             { quote: "✨ The greatest glory in living lies not in never falling, but in rising every time you fall. ✨", author: "Nelson Mandela" },
             { quote: "✨ Believe in yourself, because you are very special. ✨", author: "Inspirational Saying" },
-            { quote: "✨ The Journey of today begins when you let go of yesterday ✨", author: "Ruchita" },
+            { quote: "✨ Life is beautiful, just learn how to live it. ✨", author: "Gulzar" },
             { quote: "✨ Every day is a new beginning, never give up. ✨", author: "Great Personality" },
             { quote: "✨ When you change, the world changes. ✨", author: "Mahatma Gandhi" },
             { quote: "✨ Challenges come because we can learn something from them. ✨", author: "Siddhartha" },
@@ -697,7 +885,6 @@
         function displayRandomQuote() {
             const numQuotes = dailyQuotes.length;
             
-            // Select index based on random number
             const quoteIndex = Math.floor(Math.random() * numQuotes); 
             
             const quoteData = dailyQuotes[quoteIndex];
@@ -707,7 +894,7 @@
         }
         
         function viewAllQuotes() {
-            quotesList.innerHTML = ''; // Clear previous content
+            quotesList.innerHTML = ''; 
             dailyQuotes.forEach(quoteData => {
                 const li = document.createElement('li');
                 li.innerHTML = `${quoteData.quote} <span class="author">— ${quoteData.author}</span>`;
@@ -727,8 +914,8 @@
         // --- 6. Initialisation on Window Load ---
         window.onload = function () {
             setupMemoryWall();
-            setupDriveVideos(); // Call the new video function
-            createSudokuGrid(); 
+            setupDriveVideos(); 
+            initHanoi(); // Initialize Tower of Hanoi
             displayRandomQuote(); 
         }
 
@@ -736,4 +923,3 @@
 </body>
 
 </html>
-
